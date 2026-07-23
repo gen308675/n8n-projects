@@ -1,32 +1,20 @@
-P1: Automated AI News Aggregator & Summarizer
+# ☕ Project 1: Automated AI News Digest Agent
 
-An automated, resilient news aggregation workflow built on self-hosted **n8n** and powered by Google Gemini. The system fetches real-time news feeds, bypasses strict WAF/anti-bot scrapers using custom request headers, generates concise executive summaries via AI, and delivers formatted digests directly via Google OAuth 2.0.
-
----
-
-Tech Stack & Infrastructure
-
-* Orchestration: n8n (Self-Hosted on Railway)
-* LLM Engine: Google Gemini (Flash-lite)
-* Database: PostgreSQL (Railway production instance)
-* Delivery & Auth: Gmail API via Google Cloud Platform (OAuth 2.0)
-* Source Tracking: Custom RSS & HTTP Request nodes with `User-Agent` spoofing
+An automated, serverless intelligence workflow built on **n8n** that aggregates engineering and tech news from multi-source RSS feeds, summarizes the top stories using **Google Gemini AI**, and formats them into a clean HTML email digest delivered every morning.
 
 ---
 
-Architecture & Data Flow
+## 📸 Workflow Architecture
 
-
-[ Trigger / Schedule ]
-          │
-          ▼
-[ HTTP Request (Spoofed User-Agent) ] ──► (Bypasses WAF/Cloudflare Anti-Bot)
-          │
-          ▼
-[ XML Parser Node ] ──► (Extracts Structured Article Feed Data)
-          │
-          ▼
-[ Google Gemini Node ] ──► (Generates Executive Bullet Summaries)
-          │
-          ▼
-[ Gmail Node (OAuth 2.0) ] ──► (Delivers Clean HTML Email Digest)
+```text
+[ Schedule Trigger (7:00 AM) ]
+              │
+   [ RSS Feed Collector ] ──> Aggregates TechCrunch, The Verge, & Hacker News
+              │
+      [ RSS Read Node ]   ──> Fetches & parses article content
+              │
+    [ JS Data Sanitizer ] ──> Filters & structures top articles to optimize tokens
+              │
+  [ AI Agent (Gemini 2.5) ] ──> Evaluates impact & generates structured HTML summary
+              │
+     [ Gmail Delivery ]   ──> Sends formatted daily email newsletter

@@ -1,0 +1,209 @@
+{
+  "name": "News Digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b8c1d06b-9f2f-4d5b-9e2f-9a1cba206d5f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1296,
+        256
+      ],
+      "id": "1e9454cf-4a40-4000-9fcb-ddedcc776069",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "b64f3ah5a3WXJfT1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "gen308675@gmail.com",
+        "subject": "☕ Your 7:00 AM Tech News Digest",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1776,
+        48
+      ],
+      "id": "8259765d-2009-44ce-b3b6-3796c973e25e",
+      "name": "Send a message",
+      "webhookId": "7db2a627-bd80-42b0-86fa-5a71042998f0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "w3x0PmdYGR3BxxiX",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.articles }}",
+        "options": {
+          "systemMessage": "You are an elite research assistant. You will be provided with a raw RSS feed of today's news stories. \nYour job is to identify the top 10 most impactful tech stories and summarize them using clean HTML formatting.\n\nFormat the output exactly like this:\n<p>Here are the top 3 most impactful tech stories from the provided RSS feed:</p>\n\n<h3>1. [Title of Story]</h3>\n<p>[Insert a 2-sentence summary explaining what happened and why it matters.] <a href=\"[Insert the exact URL/link of the article]\" target=\"_blank\" style=\"color: #0066cc; text-decoration: underline;\">Read full article &rarr;</a></p>\n\n<h3>2. [Title of Story]</h3>\n<p>[Insert a 2-sentence summary explaining what happened and why it matters.] <a href=\"[Insert the exact URL/link of the article]\" target=\"_blank\" style=\"color: #0066cc; text-decoration: underline;\">Read full article &rarr;</a></p>\n\n<h3>3. [Title of Story]</h3>\n<p>[Insert a 2-sentence summary explaining what happened and why it matters.] <a href=\"[Insert the exact URL/link of the article]\" target=\"_blank\" style=\"color: #0066cc; text-decoration: underline;\">Read full article &rarr;</a></p>\n\n<h3>4. [Title of Story]</h3>\n<p>[Insert a 2-sentence summary explaining what happened and why it matters.] <a href=\"[Insert the exact URL/link of the article]\" target=\"_blank\" style=\"color: #0066cc; text-decoration: underline;\">Read full article &rarr;</a></p>\n\n<h3>5. [Title of Story]</h3>\n<p>[Insert a 2-sentence summary explaining what happened and why it matters.] <a href=\"[Insert the exact URL/link of the article]\" target=\"_blank\" style=\"color: #0066cc; text-decoration: underline;\">Read full article &rarr;</a></p>\n\n<h3>6. [Title of Story]</h3>\n<p>[Insert a 2-sentence summary explaining what happened and why it matters.] <a href=\"[Insert the exact URL/link of the article]\" target=\"_blank\" style=\"color: #0066cc; text-decoration: underline;\">Read full article &rarr;</a></p>\n\n<h3>7. [Title of Story]</h3>\n<p>[Insert a 2-sentence summary explaining what happened and why it matters.] <a href=\"[Insert the exact URL/link of the article]\" target=\"_blank\" style=\"color: #0066cc; text-decoration: underline;\">Read full article &rarr;</a></p>\n\n<h3>8. [Title of Story]</h3>\n<p>[Insert a 2-sentence summary explaining what happened and why it matters.] <a href=\"[Insert the exact URL/link of the article]\" target=\"_blank\" style=\"color: #0066cc; text-decoration: underline;\">Read full article &rarr;</a></p>\n\n<h3>9. [Title of Story]</h3>\n<p>[Insert a 2-sentence summary explaining what happened and why it matters.] <a href=\"[Insert the exact URL/link of the article]\" target=\"_blank\" style=\"color: #0066cc; text-decoration: underline;\">Read full article &rarr;</a></p>\n\n<h3>10. [Title of Story]</h3>\n<p>[Insert a 2-sentence summary explaining what happened and why it matters.] <a href=\"[Insert the exact URL/link of the article]\" target=\"_blank\" style=\"color: #0066cc; text-decoration: underline;\">Read full article &rarr;</a></p>\n\nDo not include standard markdown like asterisks (**). Output ONLY the clean HTML text blocks."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1392,
+        48
+      ],
+      "id": "470e88ab-c4c2-4184-9e54-9fd8f73b7654",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { url: 'https://techcrunch.com/feed/' } },\n  { json: { url: 'https://www.theverge.com/rss/index.xml' } },\n  { json: { url: 'https://news.ycombinator.com/rss' } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        32
+      ],
+      "id": "ef463322-ef63-4dbe-8930-f1e1bf5904ea",
+      "name": "RSS from 3 sources"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Map the collected items down to just titles, links, and text snippets to save tokens\nconst cleanedArticles = $input.all().map(item => ({\n    title: item.json.title,\n    link: item.json.link || item.json.guid,\n    summary: item.json.contentSnippet || item.json.content || \"\"\n}));\n\n// Optional: Slice the array to pass only the top 30 items to Gemini\nreturn { json: { articles: cleanedArticles.slice(0, 30) } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        48
+      ],
+      "id": "8e9c6077-4299-44cd-95d1-40c305f2c15e",
+      "name": "trims to title/link/summary"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        48
+      ],
+      "id": "3bac8859-7d31-4b02-989a-48b1881a290a",
+      "name": "RSS Read"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS from 3 sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS from 3 sources": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trims to title/link/summary": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "trims to title/link/summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "30d881ef-1450-465e-bdb7-474fa9390518",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b6ebb377a6bf8aa225b7f8d8b169ea6271a31d4112fe5fc0ce1ece93a37d8e8c"
+  },
+  "nodeGroups": [],
+  "id": "mlE26wO7dNEpBFhT",
+  "tags": []
+}
