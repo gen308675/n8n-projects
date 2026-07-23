@@ -1,0 +1,425 @@
+{
+  "name": "Lead Enrichment Router",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "6fc8e0ca-0939-4707-9d45-142a190896c6",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1664,
+        144
+      ],
+      "id": "0955433b-d617-4026-a0db-490fec1759da",
+      "name": "Webhook",
+      "webhookId": "6fc8e0ca-0939-4707-9d45-142a190896c6"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#unassigned-leads",
+          "mode": "name"
+        },
+        "text": "=⚠️ *UNASSIGNED LEAD DETECTED (MANUAL CHECK REQUIRED)* ⚠️ \n• *Contact:* {{ $('Webhook').item.json.body.first_name }} {{ $('Webhook').item.json.body.last_name }} ({{ $('Webhook').item.json.body.email }})",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        -224,
+        416
+      ],
+      "id": "8b18c34f-0776-43a1-9085-d751c50c4c4b",
+      "name": "#unassigned-leads",
+      "webhookId": "fa4bfc01-71c5-4242-b6e0-55c383220c08",
+      "credentials": {
+        "slackApi": {
+          "id": "FcToVO8CzZPMqlKe",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#enterprise-leads",
+          "mode": "name"
+        },
+        "text": "=🚨 *NEW ENTERPRISE LEAD DETECTED* 🚨\n• *Company:* {{ $json.name }}\n• *Employees:* {{ $json.employees_count }} 🏢\n• *Contact:* {{ $('SupabaseDB').item.json.first_name }} {{ $('SupabaseDB').item.json.last_name }} ({{ $('SupabaseDB').item.json.email }})",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "07c53e37-1a52-45a3-bd85-8d37a79ada56",
+      "name": "#enterprise-leads",
+      "webhookId": "26ab76ec-b58c-4475-bd01-eb7d8003acac",
+      "credentials": {
+        "slackApi": {
+          "id": "FcToVO8CzZPMqlKe",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#smb-leads",
+          "mode": "name"
+        },
+        "text": "=🚨 *NEW ENTERPRISE LEAD DETECTED* 🚨 • *Company:* {{ $json.name }} • *Employees:* {{ $json.employees_count }} 🏢 • *Contact:* {{ $('SupabaseDB').item.json.first_name }} {{ $('SupabaseDB').item.json.last_name }} ({{ $('SupabaseDB').item.json.email }})",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        224
+      ],
+      "id": "fd3d061d-c9de-43b5-8964-9d8e49e9e31b",
+      "name": "#smb-leads",
+      "webhookId": "cc26df33-dbb1-47ee-a57a-d5f70b36257b",
+      "credentials": {
+        "slackApi": {
+          "id": "FcToVO8CzZPMqlKe",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "53e48a61-a863-442d-8f13-565abfa2097a",
+              "leftValue": "={{ $json.employees_count }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -448,
+        112
+      ],
+      "id": "6a652f9b-f9ae-4d99-9d90-bf7a0042738f",
+      "name": "If is not empty"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c5800bfb-ca8b-47d2-99a3-cd9b06703b36",
+              "leftValue": "={{ $json.employees_count }}",
+              "rightValue": 500,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        96
+      ],
+      "id": "f3659f21-ddba-4e6e-8538-15a85f2b3f32",
+      "name": "employees (>=500)"
+    },
+    {
+      "parameters": {
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "first_name",
+              "fieldValue": "={{ $('Webhook').item.json.body.first_name }}"
+            },
+            {
+              "fieldId": "last_name",
+              "fieldValue": "={{ $('Webhook').item.json.body.last_name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Webhook').item.json.body.email }}"
+            },
+            {
+              "fieldId": "company_name",
+              "fieldValue": "={{ $('Webhook').item.json.body.company_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        16
+      ],
+      "id": "da8b2339-3447-4601-9d8a-5ad2426b54a7",
+      "name": "SupabaseDB",
+      "credentials": {
+        "supabaseApi": {
+          "id": "nINtmnq2184UQuSq",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://companyenrichment.abstractapi.com/v1/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=api_key",
+              "value": "5a6658c455c340f083fdff5cc4933563"
+            },
+            {
+              "name": "domain",
+              "value": "={{ $json.email.split('@')[1] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -688,
+        128
+      ],
+      "id": "ed1dda72-d007-475a-ac27-7c8a2df12cb6",
+      "name": "abstactAPI",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "leads",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.body.email }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1440,
+        144
+      ],
+      "id": "59851cb4-eccc-49e6-8a2a-1610538ad69d",
+      "name": "check for email duplicates",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "nINtmnq2184UQuSq",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "50807118-9547-48d3-93b5-e61fff8460cc",
+              "leftValue": "={{ $input.all().filter(item => Object.keys(item.json).length > 0).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1232,
+        144
+      ],
+      "id": "cba419ec-740d-4847-933a-e728ff907598",
+      "name": "is new lead?"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "check for email duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If is not empty": {
+      "main": [
+        [
+          {
+            "node": "employees (>=500)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "#unassigned-leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "employees (>=500)": {
+      "main": [
+        [
+          {
+            "node": "#enterprise-leads",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "#smb-leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SupabaseDB": {
+      "main": [
+        [
+          {
+            "node": "abstactAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "abstactAPI": {
+      "main": [
+        [
+          {
+            "node": "If is not empty",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "#unassigned-leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check for email duplicates": {
+      "main": [
+        [
+          {
+            "node": "is new lead?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is new lead?": {
+      "main": [
+        [
+          {
+            "node": "SupabaseDB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "#unassigned-leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "pmKMyuZrFHaiZafN",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "3ad8337e-4f05-4325-8f31-6a5c9c1a7bea",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b6ebb377a6bf8aa225b7f8d8b169ea6271a31d4112fe5fc0ce1ece93a37d8e8c"
+  },
+  "nodeGroups": [],
+  "id": "6EPRZmZBBnv8i6h5",
+  "tags": []
+}

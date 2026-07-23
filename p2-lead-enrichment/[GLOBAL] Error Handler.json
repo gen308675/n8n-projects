@@ -1,0 +1,71 @@
+{
+  "name": "[GLOBAL] Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4733cd1d-594e-47ee-8e6d-f4d97c4b9013",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#devops-alerts",
+          "mode": "name"
+        },
+        "text": "=🚨 *N8N WORKFLOW EXECUTION CRASHED* 🚨 • *Workflow:* {{ $json.workflow.name }} • *Execution ID:* {{ $json.execution.id }} • *Error Message:* `{{ $json.execution.error.message }}` • *Inspect Execution:* {{ $json.execution.url }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        208,
+        0
+      ],
+      "id": "39750b04-8548-4929-98cc-eb2b10f1c200",
+      "name": "#devops-alerts",
+      "webhookId": "2146992f-62ad-427b-afdb-69ea49fd2543",
+      "credentials": {
+        "slackApi": {
+          "id": "FcToVO8CzZPMqlKe",
+          "name": "Slack account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "#devops-alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e5dbff1c-cad0-47e0-b51d-68df5f43f72b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b6ebb377a6bf8aa225b7f8d8b169ea6271a31d4112fe5fc0ce1ece93a37d8e8c"
+  },
+  "nodeGroups": [],
+  "id": "pmKMyuZrFHaiZafN",
+  "tags": []
+}
